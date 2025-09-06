@@ -28,35 +28,6 @@ jobs:
             set -e   # stop on first error
             set -x   # print each command before execution
 
-              # Check sudo privileges
-            echo "🔍 Checking sudo privileges for user: $(whoami)"
-            if sudo -n true 2>/dev/null; then
-              echo "✅ User has passwordless sudo access."
-            else
-              echo "❌ User does NOT have passwordless sudo access. Please configure sudo privileges."
-              exit 1
-            fi
-
-            echo "📦 Updating system packages..."
-            sudo yum -y update || sudo apt-get -y update
-
-            echo "🔍 Checking Node.js installation..."
-            if ! command -v node >/dev/null 2>&1; then
-              echo "⚡ Installing Node.js..."
-              curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash - || curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-              sudo yum install -y nodejs git || sudo apt-get install -y nodejs git
-            else
-              echo "✅ Node.js version: $(node -v)"
-            fi
-
-            echo "🔍 Checking pm2 installation..."
-            if ! command -v pm2 >/dev/null 2>&1; then
-              echo "⚡ Installing pm2..."
-              sudo npm install -g pm2
-            else
-              echo "✅ pm2 version: $(pm2 -v)"
-            fi
-
             echo "📂 Ensuring repo directory exists..."
             mkdir -p /home/${USER}/repo
 
