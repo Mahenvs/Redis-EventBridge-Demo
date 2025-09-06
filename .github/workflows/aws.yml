@@ -28,23 +28,26 @@ jobs:
             set -e   # stop on first error
             set -x   # print each command before execution
 
-            echo "📂 Ensuring repo directory exists..."
-            mkdir -p /home/${USER}/repo
+            BASE_DIR=/home/ec2-user/repo
+            APP_DIR=$BASE_DIR/producer-express
 
-            echo "🔍 Checking if repo already cloned..."
-            if [ ! -d "/home/${USER}/repo/.git" ]; then
-              echo "⚡ Cloning repository..."
-              git clone https://github.com/Mahenvs/Redis-EventBridge-Demo.git /home/${USER}/repo
+            echo "📂 Ensuring base directory exists..."
+            mkdir -p $BASE_DIR
+
+            echo "🔍 Checking if producer-express repo already cloned..."
+            if [ ! -d "$APP_DIR/.git" ]; then
+              echo "⚡ Cloning repository fresh..."
+              rm -rf $APP_DIR
+              git clone https://github.com/Mahenvs/Redis-EventBridge-Demo.git $APP_DIR
             else
-              echo "✅ Repo already exists."
+              echo "✅ Repo already exists, pulling latest changes..."
+              cd $APP_DIR
+              git fetch origin
+              git reset --hard origin/master
             fi
 
-            echo "📂 Navigating to producer-express..."
-            cd /home/${USER}/repo/producer-express
-
-            echo "🔄 Pulling latest changes from master..."
-            git fetch origin
-            git reset --hard origin/master
+            echo "📂 Navigating to app folder..."
+            cd $APP_DIR
 
             echo "📦 Installing dependencies..."
             npm ci --omit=dev
