@@ -28,6 +28,9 @@ async function writeDB(data) {
   await fs.writeFile("db.json", JSON.stringify(data, null, 2));
 }
 
+app.get("/test",async(req,res) =>{
+      res.send({ message: "Test Route Working success" });
+})
 // Get all plans (with Redis cache)
 app.get("/plans", async (req, res) => {
   try {
