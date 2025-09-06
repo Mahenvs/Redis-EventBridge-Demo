@@ -2,7 +2,7 @@ name: Deploy to EC2
 
 on:
   push:
-    branches: ["master"] # change to "main" if that's your branch
+    branches: ["master"] # stays master as you confirmed
 
 jobs:
   deploy:
@@ -20,41 +20,57 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ vars.EC2_HOST }}
-          username: ${{ vars.EC2_USER }}
+          username: ${{ vars.EC2_USER }} # usually ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
+          script_stop: true # stops workflow if script fails
           script: |
-            # Ensure system is updated
-            sudo yum update -y || sudo apt-get update -y
+            echo "================= START DEPLOYMENT ================="
+            set -e   # stop on first error
+            set -x   # print each command before execution
 
-            # Install Node.js and npm if not installed
+            echo "📦 Updating system packages..."
+            sudo yum -y update || sudo apt-get -y update
+
+            echo "🔍 Checking Node.js installation..."
             if ! command -v node >/dev/null 2>&1; then
+              echo "⚡ Installing Node.js..."
               curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash - || curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
               sudo yum install -y nodejs git || sudo apt-get install -y nodejs git
+            else
+              echo "✅ Node.js version: $(node -v)"
             fi
 
-            # Install pm2 globally if not installed
+            echo "🔍 Checking pm2 installation..."
             if ! command -v pm2 >/dev/null 2>&1; then
+              echo "⚡ Installing pm2..."
               sudo npm install -g pm2
+            else
+              echo "✅ pm2 version: $(pm2 -v)"
             fi
 
-            # Ensure base directory exists
-            mkdir -p /home/ec2-user/repo
+            echo "📂 Ensuring repo directory exists..."
+            mkdir -p /home/${USER}/repo
 
-            # Clone repo if not present
-            if [ ! -d "/home/ec2-user/repo/.git" ]; then
-              git clone https://github.com/Mahenvs/Redis-EventBridge-Demo.git /home/ec2-user/repo
+            echo "🔍 Checking if repo already cloned..."
+            if [ ! -d "/home/${USER}/repo/.git" ]; then
+              echo "⚡ Cloning repository..."
+              git clone https://github.com/Mahenvs/Redis-EventBridge-Demo.git /home/${USER}/repo
+            else
+              echo "✅ Repo already exists."
             fi
 
-            # Go into producer-express folder
-            cd /home/ec2-user/repo/redis-lambda/producer-express
+            echo "📂 Navigating to producer-express..."
+            cd /home/${USER}/repo/redis-lambda/producer-express
 
-            # Pull latest code
+            echo "🔄 Pulling latest changes from master..."
             git fetch origin
-            git reset --hard origin/master   # change to origin/main if your branch is main
+            git reset --hard origin/master
 
-            # Install dependencies
+            echo "📦 Installing dependencies..."
             npm ci --omit=dev
 
-            # Restart or start app with PM2
+            echo "🚀 Restarting app with pm2..."
             pm2 restart producer-express || pm2 start index.js --name producer-express
             pm2 save
+
+            echo "================= DEPLOYMENT COMPLETE ✅ ================="
