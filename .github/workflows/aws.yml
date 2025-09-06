@@ -2,7 +2,7 @@ name: Deploy to EC2
 
 on:
   push:
-    branches: ["master"]
+    branches: ["master"] # change to "main" if that's your branch
 
 jobs:
   deploy:
@@ -23,8 +23,25 @@ jobs:
           username: ${{ vars.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            # Ensure system is updated
+            sudo yum update -y || sudo apt-get update -y
+
+            # Install Node.js and npm if not installed
+            if ! command -v node >/dev/null 2>&1; then
+              curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash - || curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+              sudo yum install -y nodejs git || sudo apt-get install -y nodejs git
+            fi
+
+            # Install pm2 globally if not installed
+            if ! command -v pm2 >/dev/null 2>&1; then
+              sudo npm install -g pm2
+            fi
+
+            # Ensure base directory exists
+            mkdir -p /home/ec2-user/repo
+
             # Clone repo if not present
-            if [ ! -d "/home/ec2-user/repo" ]; then
+            if [ ! -d "/home/ec2-user/repo/.git" ]; then
               git clone https://github.com/Mahenvs/Redis-EventBridge-Demo.git /home/ec2-user/repo
             fi
 
@@ -33,6 +50,11 @@ jobs:
 
             # Pull latest code
             git fetch origin
-            git reset --hard origin/master   # or origin/main if that's your branch
+            git reset --hard origin/master   # change to origin/main if your branch is main
+
+            # Install dependencies
             npm ci --omit=dev
+
+            # Restart or start app with PM2
             pm2 restart producer-express || pm2 start index.js --name producer-express
+            pm2 save
