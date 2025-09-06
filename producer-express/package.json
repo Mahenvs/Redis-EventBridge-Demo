@@ -1,0 +1,19 @@
+{
+  "name": "redis-lambda",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@aws-sdk/client-eventbridge": "^3.883.0",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "redis": "^5.8.2"
+  }
+}

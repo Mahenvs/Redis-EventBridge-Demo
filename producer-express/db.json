@@ -1,0 +1,22 @@
+{
+    "plans": [
+        {
+            "id": "plan:101",
+            "name": "Basic Talktime",
+            "price": 10,
+            "validity": "7 days",
+            "data": "500MB",
+            "calls": "100 mins",
+            "sms": "50 SMS"
+        },
+        {
+            "id": "plan:102",
+            "name": "Weekly Combo",
+            "price": 25,
+            "validity": "7 days",
+            "data": "2GB",
+            "calls": "Unlimited",
+            "sms": "100 SMS/day"
+        }
+    ]
+}
