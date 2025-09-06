@@ -32,7 +32,7 @@ jobs:
             mkdir -p /home/${USER}/repo
 
             echo "🔍 Checking if repo already cloned..."
-            if [ ! -d "/home/${USER}/repo/.git" ]; then
+            if [ ! -d "/home/${USER}/.git" ]; then
               echo "⚡ Cloning repository..."
               git clone https://github.com/Mahenvs/Redis-EventBridge-Demo.git /home/${USER}/repo
             else
@@ -40,7 +40,7 @@ jobs:
             fi
 
             echo "📂 Navigating to producer-express..."
-            cd /home/${USER}/repo/redis-lambda/producer-express
+            cd /home/${USER}/repo/producer-express
 
             echo "🔄 Pulling latest changes from master..."
             git fetch origin
