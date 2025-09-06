@@ -29,7 +29,8 @@ async function writeDB(data) {
 }
 
 app.get("/test",async(req,res) =>{
-      res.send({ message: "Test Route Working success" });
+      
+  res.send({ message: "Test Route Working success" });
 })
 // Get all plans (with Redis cache)
 app.get("/plans", async (req, res) => {
@@ -93,6 +94,21 @@ app.post("/updatePlan", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
+
+app.post("/cache", async (req, res) => {
+  try {
+    console.log(" I a m in cache : Updating elasticCache");
+    
+    const db = await readDB();
+    await client.set("plans", JSON.stringify(db.plans));
+
+    res.send({ message: "Key added", key, value });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error writing to cache");
+  }
+});
+
 // Update or add a plan (update DB + Redis)
 // app.post("/updatePlan", async (req, res) => {
 //   try {
