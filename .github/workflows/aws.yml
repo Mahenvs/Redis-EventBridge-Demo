@@ -28,6 +28,15 @@ jobs:
             set -e   # stop on first error
             set -x   # print each command before execution
 
+              # Check sudo privileges
+            echo "🔍 Checking sudo privileges for user: $(whoami)"
+            if sudo -n true 2>/dev/null; then
+              echo "✅ User has passwordless sudo access."
+            else
+              echo "❌ User does NOT have passwordless sudo access. Please configure sudo privileges."
+              exit 1
+            fi
+
             echo "📦 Updating system packages..."
             sudo yum -y update || sudo apt-get -y update
 
