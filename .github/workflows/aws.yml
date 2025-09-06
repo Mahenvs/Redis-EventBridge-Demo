@@ -41,6 +41,14 @@ jobs:
             APP_DIR=$BASE_DIR/producer-express
             cd $APP_DIR
 
+            echo "📄 Writing .env file..."
+            cat > .env <<EOF
+            PORT=${{ secrets.PORT }}
+            REDIS_URL=${{ secrets.REDIS_URL }}
+            AWS_REGION=${{ vars.AWS_REGION }}
+            EVENT_BUS_NAME=${{ secrets.EVENT_BUS_NAME }}
+            EOF
+
             echo "📦 Installing dependencies..."
             npm ci --omit=dev
 
