@@ -32,7 +32,7 @@ jobs:
             mkdir -p /home/${USER}/repo
 
             echo "🔍 Checking if repo already cloned..."
-            if [ ! -d "/home/${USER}/.git" ]; then
+            if [ ! -d "/home/${USER}/repo/.git" ]; then
               echo "⚡ Cloning repository..."
               git clone https://github.com/Mahenvs/Redis-EventBridge-Demo.git /home/${USER}/repo
             else
