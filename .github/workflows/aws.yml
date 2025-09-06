@@ -1,0 +1,27 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ vars.EC2_HOST }}
+          username: ${{ vars.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ec2-user/redis-lambda/producer-express || \
+              (mkdir -p /home/ec2-user && git clone https://github.com/<your-username>/<your-repo>.git /home/ec2-user/repo)
+            cd /home/ec2-user/repo/redis-lambda/producer-express
+            git pull origin main
+            npm ci --omit=dev
+            pm2 restart producer-express || pm2 start index.js --name producer-express
