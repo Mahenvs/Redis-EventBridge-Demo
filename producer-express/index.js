@@ -102,7 +102,7 @@ app.post("/cache", async (req, res) => {
     const db = await readDB();
     await client.set("plans", JSON.stringify(db.plans));
 
-    res.send({ message: "Key added", key, value });
+    res.send({ message: "Key added", data:JSON.stringify(db.plans) });
   } catch (err) {
     console.error(err);
     res.status(500).send("Error writing to cache");
